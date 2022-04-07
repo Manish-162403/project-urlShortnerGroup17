@@ -55,6 +55,14 @@ const createUrl = async function (req, res) {
         
         }
 
+        
+          if(!(/(:?^((https|http|HTTP|HTTPS){1}:\/\/)(([w]{3})[\.]{1})?([a-zA-Z0-9]{1,}[\.])[\w]((\/){1}([\w@?^=%&amp;~+#-_.]+)))$/.test(longUrl.trim()))){
+           
+            return res.status(400).send({ status: false, message: "please provide valid URL" })
+    
+            }
+        
+        
         //let existUrl = await urlModel.findOne({longUrl:longUrl})
         // if(existUrl) return res.status(201).send({ status: true, data: existUrl })
 

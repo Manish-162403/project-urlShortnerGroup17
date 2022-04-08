@@ -85,9 +85,9 @@ const createUrl = async function (req, res) {
 
             await SET_ASYNC(`${longUrl}`, JSON.stringify(urlPresent))
 
-        let newOne = JSON.parse(urlPresent)
+       // let newOne = JSON.parse(urlPresent)
 
-            return res.status(200).send({ status: true, data: newOne.longUrl })
+            return res.status(200).send({ status: true, data: urlPresent.longUrl })
 
         }
 

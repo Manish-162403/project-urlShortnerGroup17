@@ -8,8 +8,6 @@ const validUrl = require('valid-url')
 const redis = require("redis");
 
 const { promisify } = require("util");
-// const { url } = require("inspector");
-
 
 const redisClient = redis.createClient({host:'redis-17454.c15.us-east-1-4.ec2.cloud.redislabs.com',port:17454,username:'functioup-free-db',password:'yiIOJJ2luH3yHDzmp0WppDFtuUxn5aqO'});
 

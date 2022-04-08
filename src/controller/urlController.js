@@ -87,7 +87,7 @@ const createUrl = async function (req, res) {
 
        // let newOne = JSON.parse(urlPresent)
 
-            return res.status(201).send({ status: true, data: urlPresent.longUrl })
+            return res.status(201).send({ status: true, data: urlPresent })
 
         }
 

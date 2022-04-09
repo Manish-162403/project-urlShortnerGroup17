@@ -36,13 +36,10 @@ const isValid = function (value) {
 
 const createUrl = async function (req, res) {
     try {
-
         const longUrl1 = req.body
-
         if(Object.keys(longUrl1).length == 0){return res.status(400).send({status:false, message: "please input some data in body"})}
 
         const {longUrl} = longUrl1
-
         if (!isValid(longUrl)) {
             return res.status(400).send({ status: false, message: "Long URL required" })
         }
@@ -51,64 +48,39 @@ const createUrl = async function (req, res) {
             return res.status(400).send({ status: false, message: "Invalid LongURL" })
         }
 
-        // if (!(/^\S*$/.test(longUrl))) {
-
-        //     return res.status(400).send({ status: false, message: "Not a valid LongURL" })
-
-        // }
-
         if (!longUrl) {
-            
             return res.status(400).send({ status: false, message: "please provide required input field" })
-        
-        }
+          }
 
         const baseUrl = "http://localhost:3000"
 
         if (!validUrl.isUri(baseUrl)) {
-
             return res.status(400).send({ status: false, message: "invalid base URL" })
+        }
 
+
+
+        let urlPresent = await urlModel.findOne({ longUrl: longUrl }).select({ _id: 0, createdAt: 0, updatedAt: 0, __v: 0 })
+        if (urlPresent) {
+            await SET_ASYNC(`${longUrl}`, JSON.stringify(urlPresent))
+            return res.status(201).send({ status: true, data: urlPresent })
         }
 
         const cahcedUrlData = await GET_ASYNC(`${longUrl}`)
-
         if (cahcedUrlData) {
-
-            return res.status(201).send({ status: "true", data: cahcedUrlData })
-
-        }
-
-        let urlPresent = await urlModel.findOne({ longUrl: longUrl }).select({ _id: 0, createdAt: 0, updatedAt: 0, __v: 0 })
-
-        if (urlPresent) {
-
-            await SET_ASYNC(`${longUrl}`, JSON.stringify(urlPresent))
-
-       // let newOne = JSON.parse(urlPresent)
-
-            return res.status(201).send({ status: true, data: urlPresent })
-
+            return res.status(200).send({ status:true, data: cahcedUrlData })
         }
 
         const urlCode = shortId.generate()
-
         const url = await urlModel.findOne({ urlCode: urlCode })
-
         if (url) {
-
             return res.status(400).send({ status: false, message: "urlCode already exist in tha db" })
-
         }
 
         const shortUrl = baseUrl + '/' + urlCode
-
         const dupshortUrl = await urlModel.findOne({ shortUrl: shortUrl })
-
         if (dupshortUrl) {
-
             return res.status(400).send({ status: false, message: "shortUrl already exist in tha db" })
-
         }
 
         const newUrl = {
@@ -119,18 +91,10 @@ const createUrl = async function (req, res) {
 
 
         const createUrl = await urlModel.create(newUrl)
-
         return res.status(201).send({ status: true, data: newUrl })
-
-    }
-
-    catch (err) {
-
+    }catch (err) {
         return res.status(500).send({ status: false, message: err.message })
-
-    }
-
-}
+    }}
 
 
 
@@ -140,11 +104,12 @@ const createUrl = async function (req, res) {
 const getUrl = async function (req, res) {
     try {
         const urlCode = req.params.urlCode
+       
 
         if(!urlCode) { return res.status(400).send({ status: false, message: "urlCode required" }) }
 
+        if (!shortId.isValid(urlCode)) { return res.status(404).send({ status: false, message: "Invalid urlCode" }) }
 
-        if (!shortId.isValid(urlCode)) { return res.status(400).send({ status: false, message: "Invalid urlCode" }) }
 
         let cahcedUrlCode = await GET_ASYNC(`${urlCode}`)
 
@@ -156,18 +121,14 @@ const getUrl = async function (req, res) {
         const url = await urlModel.findOne({ urlCode: urlCode })
 
         if (url) {
-            SET_ASYNC(`${urlCode}`, JSON.stringify(url.longUrl))
-
+           
             return res.status(200).redirect(url.longUrl)
-
-        }
-        else {
+        }else {
             return res.status(404).send({ status: false, message: "No such URL FOUND" })
         }
     } catch (err) {
         return res.status(500).send({ status: true, message: err.message })
-    }
-}
+    }}
 
 
 module.exports.createUrl = createUrl
